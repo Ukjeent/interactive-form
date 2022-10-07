@@ -11,12 +11,16 @@ const activitesSection = document.getElementById('activities');
 const activitiesCost = document.getElementById('activities-cost');
 let activitesTotalCost = 0;
 
+const activites = document.querySelectorAll('#activities-box [type="checkbox"]')
+
 const paymentMethods = document.querySelectorAll('.payment-methods > div');
 const paymentMethodSelect = document.getElementById('payment');
 const paymentMethodCreditCard = document.querySelector('#payment [value="credit-card"]');
 const creditCardForms = document.getElementById('credit-card');
 const paypalInfo = document.getElementById('paypal');
 const bitCoinInfo = document.getElementById('bitcoin');
+
+const submitBtn = document.querySelector('[type="submit"]');
 
 
 /////////////////
@@ -96,3 +100,50 @@ paymentMethodSelect.addEventListener('change', (e) => {
         }
     });
 });
+
+//
+// Form submit
+//
+
+const nameValidation = /[a-zA-Z]/;
+const nameInput = document.getElementById('name');
+
+const emailValidation = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+const emailInput = document.getElementById('email');
+
+const cardValidation = /^(?:4[0-9]{12}(?:[0-9]{3})?|[25][1-7][0-9]{14}|6(?:011|5[0-9][0-9])[0-9]{12}|3[47][0-9]{13}|3(?:0[0-5]|[68][0-9])[0-9]{11}|(?:2131|1800|35\d{3})\d{11})$/;
+const cardInput = document.getElementById('cc-num');
+
+        // Test Credit Card Account Numbers //
+            // American Express: 378282246310005
+            // MasterCard: 5105105105105100
+            // Visa: 4111111111111111
+            // Diners Club: 30569309025904
+        // /Test Credit Card Account Numbers //
+
+const zipValidation = /^\d{5}$/;
+const zipInput = document.getElementById('zip');
+
+const cvvValidation = /^\d{3}$/;
+const cvvInput = document.getElementById('cvv');
+
+function validateField(field, validationString) {
+    const InputValue = field.value;
+    const validationResult = validationString.test(InputValue);
+    return validationResult;
+}
+
+
+
+// The "Register for Activities" section must have at least one activity selected.
+
+function submitForms(btn) {
+    // console.log(`name: ${validateField(nameInput, nameValidation)}`);
+    // console.log(`email: ${validateField(emailInput, emailValidation)}`);
+    // console.log(`card: ${validateField(cardInput, cardValidation)}`);
+    // console.log(`zip: ${validateField(zipInput, zipValidation)}`);
+    // console.log(`cvv: ${validateField(cvvInput, cvvValidation)}`);
+    
+    console.log(activites.some( element => true ))
+}
+
