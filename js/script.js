@@ -1,5 +1,12 @@
+const form = document.querySelector('form');
+
 const nameField = document.getElementById('name');
+const emailField = document.getElementById('email');
+const cardField = document.getElementById('cc-num');
+const zipField = document.getElementById('zip');
+const cvvField = document.getElementById('cvv');
 const jobRole = document.getElementById('title');
+const jobRoleOptions = document.querySelectorAll('#title option');
 const otherJobRole = jobRole.nextElementSibling;
 
 const tShirtColor = document.getElementById('color');
@@ -7,7 +14,7 @@ const tShirtDesign = document.getElementById('design');
 const colors = document.querySelectorAll('[data-theme]');
 const hiddenColorOption = document.querySelector('#color option');
 
-const activitesSection = document.getElementById('activities');
+const activitesSection = document.querySelector('#activities');
 const activitiesCost = document.getElementById('activities-cost');
 let activitesTotalCost = 0;
 
@@ -34,6 +41,74 @@ function selectColors(show) {
 }
 
 
+// Checks if any activity matches the time of the selected activity and disables all activities that matches
+function checkActivityTimeAdd(checkBox) {
+    const activityTime = checkBox.dataset.dayAndTime;
+    activites.forEach(element => {
+        if ( !element.checked && element.dataset.dayAndTime === activityTime) {
+            element.disabled = true;
+            element.parentNode.classList.add('disabled')
+        }
+    });
+}
+
+// Checks if any activity matches the time of the selected activity and enables the selected activities that don't match.
+function checkActivityTimeRemove(checkBox) {
+    const activityTime = checkBox.dataset.dayAndTime;
+    activites.forEach(element => {
+        if ( !element.checked && element.dataset.dayAndTime === activityTime) {
+            element.disabled = false;
+            element.parentNode.classList.remove('disabled')
+        }
+    });
+}
+
+// Takes a field element and a validation string then validates the fieldvalue. Returns true or false.
+function validateField(field, validationString) {
+    const InputValue = field.value;
+    const hint = field.parentNode.lastElementChild;
+    const result = validationString.test(InputValue);
+    if (!result) {
+        field.parentNode.classList.add('not-valid');
+        field.parentNode.classList.remove('valid');
+        hint.style.display = 'block';
+    } else {
+        field.parentNode.classList.remove('not-valid');
+        field.parentNode.classList.add('valid');
+        hint.style.display = 'none';
+    }
+    return result;
+}
+
+// Turns a nodelist to an array, then checks if any of the elements in the array is checked. Returns true or false.
+function isAnyInputChecked(nodeLi, errorElement) {
+    const arr = Array.from(nodeLi);
+    const result = arr.some( element => element.checked );
+    if (!result) {
+        errorElement.classList.add('not-valid');
+        errorElement.classList.remove('valid');
+    } else {
+        errorElement.classList.remove('not-valid');
+        errorElement.classList.add('valid');
+    }
+    return result;
+}
+
+// Validates all element and store the validationresult. Returns the array with the result to use in the submit eventlistener.
+function validateAllElements() {
+    const validationStatus = [];
+    validationStatus.push(validateField(nameInput, nameValidation));
+    validationStatus.push(validateField(emailInput, emailValidation));
+    validationStatus.push(isAnyInputChecked(activites, activitesSection));
+    if (paymentMethodSelect.value === 'credit-card') { // If creditcard is selected as payment method, validate crecitcard fields. 
+        validationStatus.push(validateField(cardInput, cardValidation));
+        validationStatus.push(validateField(zipInput, zipValidation));
+        validationStatus.push(validateField(cvvInput, cvvValidation));
+    }
+    return validationStatus;
+}
+
+
 ////////////////////
 /// FunctionsEnd ///
 ////////////////////
@@ -56,6 +131,7 @@ jobRole.addEventListener('change', (e) => {
     }
 });
 
+
 // Disables the t-shirt color element on pageload
 tShirtColor.disabled = true;
 
@@ -75,8 +151,10 @@ activitesSection.addEventListener('change', (e) => {
     checkBox = e.target;
     if (checkBox.checked) {
         activitesTotalCost += parseInt(checkBox.dataset.cost);
+        checkActivityTimeAdd(checkBox)
     } else {
         activitesTotalCost -= parseInt(checkBox.dataset.cost);
+        checkActivityTimeRemove(checkBox)
     }
     activitiesCost.innerHTML = `Total: $${activitesTotalCost}`; // Updates the innerHTML and displays the totlacost on the page.
 });
@@ -102,7 +180,24 @@ paymentMethodSelect.addEventListener('change', (e) => {
 });
 
 //
-// Form submit
+// focus & blur 
+//
+
+// Adds the focus class to the the activities boxes on focus
+activitesSection.addEventListener('focus', (e) => {
+    const focusTarget = e.target;
+    focusTarget.parentNode.classList.add('focus')
+}, true);
+
+// Removes the focus class from the the activities boxes on blur
+activitesSection.addEventListener('blur', (e) => {
+    const focusTarget = e.target;
+    focusTarget.parentNode.classList.remove('focus')
+}, true);
+
+
+//
+// Validations 
 //
 
 const nameValidation = /[a-zA-Z]/;
@@ -127,57 +222,56 @@ const zipInput = document.getElementById('zip');
 const cvvValidation = /^\d{3}$/;
 const cvvInput = document.getElementById('cvv');
 
-// Takes a field element and a validation string then validates the fieldvalue. Returns true or false.
-function validateField(field, validationString) {
-    const InputValue = field.value;
-    const validationResult = validationString.test(InputValue);
-    if (!validationResult) {
-        field.parentNode.classList.add('not-valid');
-        return validationResult;
-    } else {
-        field.parentNode.classList.remove('not-valid');
-        return validationResult;
+//
+// /Validations 
+//
+
+// OnkeyUp validations
+nameField.addEventListener('keyup', () => {
+    validateField(nameInput, nameValidation);
+});
+emailField.addEventListener('keyup', () => {
+    validateField(emailInput, emailValidation);
+});
+
+cardField.addEventListener('keyup', () => {
+    validateField(cardInput, cardValidation);
+});
+
+zipField.addEventListener('keyup', () => {
+    validateField(zipInput, zipValidation);
+});
+cvvField.addEventListener('keyup', () => {
+    validateField(cvvInput, cvvValidation);
+});
+
+
+
+// Listens for a submit event
+form.addEventListener('submit', (e) => {
+    validationStatus = validateAllElements(); // Validates all elements 
+    if (validationStatus.some(element => !element)) {  // If any element returns false, prevent default, else submit
+        e.preventDefault()
     }
-
-    }
-
-// Turns a nodelist to an array, then checks if any of the elements in the array is checked. Returns true or false.
-function isAnyInputChecked(nodeLi) {
-    const arr = Array.from(nodeLi);
-    const result = arr.some( element => element.checked );
-    if (!result) {
-        nodeLi.parentNode.classList.add('not-valid');
-        return result;
-    } else {
-        nodeLi.parentNode.classList.remove('not-valid');
-        return result;
-    }
-
-}
-
-function validateAllElements() {
-    validateField(nameInput, nameValidation)
-    validateField(nameInput, nameValidation)
-    validateField(emailInput, emailValidation)
-    validateField(cardInput, cardValidation)
-    validateField(zipInput, zipValidation)
-    validateField(cvvInput, cvvValidation)
-    isAnyInputChecked(activites)
-}
+});
 
 
 
-// The "Register for Activities" section must have at least one activity selected.
+/////////////////////////////////////////////
 
-function submitForms(btn) {
-    if (validateField(nameInput, nameValidation)) {
-        console.log('submit');
-    }
-    console.log(`name: ${validateField(nameInput, nameValidation)}`);
-    console.log(`email: ${validateField(emailInput, emailValidation)}`);
-    console.log(`card: ${validateField(cardInput, cardValidation)}`);
-    console.log(`zip: ${validateField(zipInput, zipValidation)}`);
-    console.log(`cvv: ${validateField(cvvInput, cvvValidation)}`);
-    console.log(isAnyInputChecked(activites))
-}
+// Validate selectlist
 
+// function isAnyInputSelected(select, validationString) {
+//     const result = select.value !== validationString;
+//     if (!result) {
+//         select.classList.add('not-valid');
+//         select.previousElementSibling.classList.add('not-valid');
+//         return result;
+//     } else {
+//         select.classList.remove('not-valid');
+//         select.previousElementSibling.classList.reomve('not-valid');
+//         return result;
+//     }
+// }
+
+// validationStatus.push(isAnyInputSelected(jobRole, 'Select Job Role'));
