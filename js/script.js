@@ -127,10 +127,42 @@ const zipInput = document.getElementById('zip');
 const cvvValidation = /^\d{3}$/;
 const cvvInput = document.getElementById('cvv');
 
+// Takes a field element and a validation string then validates the fieldvalue. Returns true or false.
 function validateField(field, validationString) {
     const InputValue = field.value;
     const validationResult = validationString.test(InputValue);
-    return validationResult;
+    if (!validationResult) {
+        field.parentNode.classList.add('not-valid');
+        return validationResult;
+    } else {
+        field.parentNode.classList.remove('not-valid');
+        return validationResult;
+    }
+
+    }
+
+// Turns a nodelist to an array, then checks if any of the elements in the array is checked. Returns true or false.
+function isAnyInputChecked(nodeLi) {
+    const arr = Array.from(nodeLi);
+    const result = arr.some( element => element.checked );
+    if (!result) {
+        nodeLi.parentNode.classList.add('not-valid');
+        return result;
+    } else {
+        nodeLi.parentNode.classList.remove('not-valid');
+        return result;
+    }
+
+}
+
+function validateAllElements() {
+    validateField(nameInput, nameValidation)
+    validateField(nameInput, nameValidation)
+    validateField(emailInput, emailValidation)
+    validateField(cardInput, cardValidation)
+    validateField(zipInput, zipValidation)
+    validateField(cvvInput, cvvValidation)
+    isAnyInputChecked(activites)
 }
 
 
@@ -138,12 +170,14 @@ function validateField(field, validationString) {
 // The "Register for Activities" section must have at least one activity selected.
 
 function submitForms(btn) {
-    // console.log(`name: ${validateField(nameInput, nameValidation)}`);
-    // console.log(`email: ${validateField(emailInput, emailValidation)}`);
-    // console.log(`card: ${validateField(cardInput, cardValidation)}`);
-    // console.log(`zip: ${validateField(zipInput, zipValidation)}`);
-    // console.log(`cvv: ${validateField(cvvInput, cvvValidation)}`);
-    
-    console.log(activites.some( element => true ))
+    if (validateField(nameInput, nameValidation)) {
+        console.log('submit');
+    }
+    console.log(`name: ${validateField(nameInput, nameValidation)}`);
+    console.log(`email: ${validateField(emailInput, emailValidation)}`);
+    console.log(`card: ${validateField(cardInput, cardValidation)}`);
+    console.log(`zip: ${validateField(zipInput, zipValidation)}`);
+    console.log(`cvv: ${validateField(cvvInput, cvvValidation)}`);
+    console.log(isAnyInputChecked(activites))
 }
 
