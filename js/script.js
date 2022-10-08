@@ -6,7 +6,6 @@ const cardField = document.getElementById('cc-num');
 const zipField = document.getElementById('zip');
 const cvvField = document.getElementById('cvv');
 const jobRole = document.getElementById('title');
-const jobRoleOptions = document.querySelectorAll('#title option');
 const otherJobRole = jobRole.nextElementSibling;
 
 const tShirtColor = document.getElementById('color');
@@ -18,16 +17,14 @@ const activitesSection = document.querySelector('#activities');
 const activitiesCost = document.getElementById('activities-cost');
 let activitesTotalCost = 0;
 
-const activites = document.querySelectorAll('#activities-box [type="checkbox"]')
+const activites = document.querySelectorAll('#activities-box [type="checkbox"]');
 
 const paymentMethods = document.querySelectorAll('.payment-methods > div');
 const paymentMethodSelect = document.getElementById('payment');
 const paymentMethodCreditCard = document.querySelector('#payment [value="credit-card"]');
-const creditCardForms = document.getElementById('credit-card');
 const paypalInfo = document.getElementById('paypal');
 const bitCoinInfo = document.getElementById('bitcoin');
 
-const submitBtn = document.querySelector('[type="submit"]');
 
 
 /////////////////
@@ -47,7 +44,7 @@ function checkActivityTimeAdd(checkBox) {
     activites.forEach(element => {
         if ( !element.checked && element.dataset.dayAndTime === activityTime) {
             element.disabled = true;
-            element.parentNode.classList.add('disabled')
+            element.parentNode.classList.add('disabled');
         }
     });
 }
@@ -58,7 +55,7 @@ function checkActivityTimeRemove(checkBox) {
     activites.forEach(element => {
         if ( !element.checked && element.dataset.dayAndTime === activityTime) {
             element.disabled = false;
-            element.parentNode.classList.remove('disabled')
+            element.parentNode.classList.remove('disabled');
         }
     });
 }
@@ -99,6 +96,7 @@ function validateAllElements() {
     const validationStatus = [];
     validationStatus.push(validateField(nameInput, nameValidation));
     validationStatus.push(validateField(emailInput, emailValidation));
+        conditionalErrorText(); 
     validationStatus.push(isAnyInputChecked(activites, activitesSection));
     if (paymentMethodSelect.value === 'credit-card') { // If creditcard is selected as payment method, validate crecitcard fields. 
         validationStatus.push(validateField(cardInput, cardValidation));
@@ -141,9 +139,9 @@ tShirtDesign.addEventListener('change', (e) => {
     const element = e.target;
     tShirtColor.disabled = false; //Enables the colordropdown
     hiddenColorOption.selected = true; //Selects the hidden option if the user changes design.
-    hiddenColorOption.innerHTML = 'Select color' // Changes the text in the hidden option to "select another color"
+    hiddenColorOption.innerHTML = 'Select color'; // Changes the text in the hidden option to "select another color"
     colors.forEach( element => element.hidden = true); //Hides all options
-    selectColors(element.value) // Displays the options that are available for the selected design
+    selectColors(element.value); // Displays the options that are available for the selected design
 });
 
 //Listens for a change in the register for actvites fieldset updates the total cost of the users selected activites
@@ -151,12 +149,13 @@ activitesSection.addEventListener('change', (e) => {
     checkBox = e.target;
     if (checkBox.checked) {
         activitesTotalCost += parseInt(checkBox.dataset.cost);
-        checkActivityTimeAdd(checkBox)
+        checkActivityTimeAdd(checkBox);
     } else {
         activitesTotalCost -= parseInt(checkBox.dataset.cost);
-        checkActivityTimeRemove(checkBox)
+        checkActivityTimeRemove(checkBox);
     }
     activitiesCost.innerHTML = `Total: $${activitesTotalCost}`; // Updates the innerHTML and displays the totlacost on the page.
+    isAnyInputChecked(activites, activitesSection);
 });
 
 //
@@ -186,13 +185,13 @@ paymentMethodSelect.addEventListener('change', (e) => {
 // Adds the focus class to the the activities boxes on focus
 activitesSection.addEventListener('focus', (e) => {
     const focusTarget = e.target;
-    focusTarget.parentNode.classList.add('focus')
+    focusTarget.parentNode.classList.add('focus');
 }, true);
 
 // Removes the focus class from the the activities boxes on blur
 activitesSection.addEventListener('blur', (e) => {
     const focusTarget = e.target;
-    focusTarget.parentNode.classList.remove('focus')
+    focusTarget.parentNode.classList.remove('focus');
 }, true);
 
 
@@ -209,22 +208,12 @@ const emailInput = document.getElementById('email');
 const cardValidation = /^(?:4[0-9]{12}(?:[0-9]{3})?|[25][1-7][0-9]{14}|6(?:011|5[0-9][0-9])[0-9]{12}|3[47][0-9]{13}|3(?:0[0-5]|[68][0-9])[0-9]{11}|(?:2131|1800|35\d{3})\d{11})$/;
 const cardInput = document.getElementById('cc-num');
 
-        // Test Credit Card Account Numbers //
-            // American Express: 378282246310005
-            // MasterCard: 5105105105105100
-            // Visa: 4111111111111111
-            // Diners Club: 30569309025904
-        // /Test Credit Card Account Numbers //
-
 const zipValidation = /^\d{5}$/;
 const zipInput = document.getElementById('zip');
 
 const cvvValidation = /^\d{3}$/;
 const cvvInput = document.getElementById('cvv');
 
-//
-// /Validations 
-//
 
 // OnkeyUp validations
 nameField.addEventListener('keyup', () => {
@@ -232,6 +221,7 @@ nameField.addEventListener('keyup', () => {
 });
 emailField.addEventListener('keyup', () => {
     validateField(emailInput, emailValidation);
+    conditionalErrorText();
 });
 
 cardField.addEventListener('keyup', () => {
@@ -245,13 +235,21 @@ cvvField.addEventListener('keyup', () => {
     validateField(cvvInput, cvvValidation);
 });
 
+function conditionalErrorText() {
+    if (emailInput.value === '') {
+        emailInput.parentNode.lastElementChild.innerHTML = 'Email field cannot be blank';
+    } else {
+        emailInput.parentNode.lastElementChild.innerHTML = 'Email address must be formatted correctly';
+    }
+}
+
 
 
 // Listens for a submit event
 form.addEventListener('submit', (e) => {
     validationStatus = validateAllElements(); // Validates all elements 
     if (validationStatus.some(element => !element)) {  // If any element returns false, prevent default, else submit
-        e.preventDefault()
+        e.preventDefault();
     }
 });
 
