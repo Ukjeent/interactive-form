@@ -27,6 +27,13 @@ const bitCoinInfo = document.getElementById('bitcoin');
 
 
 
+const nameErrorOne = 'Name field cannot be blank';
+const nameErrorTwo = 'The name field can only contain letters and spaces';
+
+const emailErrorOne = 'Email field cannot be blank';
+const emailErrorTwo = 'Email address must be formatted correctly';
+
+
 /////////////////
 /// Functions ///
 /////////////////
@@ -91,12 +98,17 @@ function isAnyInputChecked(nodeLi, errorElement) {
     return result;
 }
 
+
+
+
 // Validates all element and store the validationresult. Returns the array with the result to use in the submit eventlistener.
 function validateAllElements() {
     const validationStatus = [];
     validationStatus.push(validateField(nameInput, nameValidation));
+        conditionalErrorText(nameInput, nameErrorOne, nameErrorTwo);
     validationStatus.push(validateField(emailInput, emailValidation));
-        conditionalErrorText(); 
+        // conditionalErrorText();
+        conditionalErrorText(emailInput, emailErrorOne, emailErrorTwo);
     validationStatus.push(isAnyInputChecked(activites, activitesSection));
     if (paymentMethodSelect.value === 'credit-card') { // If creditcard is selected as payment method, validate crecitcard fields. 
         validationStatus.push(validateField(cardInput, cardValidation));
@@ -104,6 +116,14 @@ function validateAllElements() {
         validationStatus.push(validateField(cvvInput, cvvValidation));
     }
     return validationStatus;
+}
+
+function conditionalErrorText(field, errorBlank, errorFormat) {
+    if (field.value === '') {
+        field.parentNode.lastElementChild.innerHTML = errorBlank;
+    } else {
+        field.parentNode.lastElementChild.innerHTML = errorFormat;
+    }
 }
 
 
@@ -199,7 +219,7 @@ activitesSection.addEventListener('blur', (e) => {
 // Validations 
 //
 
-const nameValidation = /[a-zA-Z]/;
+const nameValidation = /^[a-zA-Z\s]+$/;
 const nameInput = document.getElementById('name');
 
 const emailValidation = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
@@ -218,10 +238,11 @@ const cvvInput = document.getElementById('cvv');
 // OnkeyUp validations
 nameField.addEventListener('keyup', () => {
     validateField(nameInput, nameValidation);
+    conditionalErrorText(nameInput, nameErrorOne, nameErrorTwo);
 });
 emailField.addEventListener('keyup', () => {
     validateField(emailInput, emailValidation);
-    conditionalErrorText();
+    conditionalErrorText(emailInput, emailErrorOne, emailErrorTwo);
 });
 
 cardField.addEventListener('keyup', () => {
@@ -234,14 +255,6 @@ zipField.addEventListener('keyup', () => {
 cvvField.addEventListener('keyup', () => {
     validateField(cvvInput, cvvValidation);
 });
-
-function conditionalErrorText() {
-    if (emailInput.value === '') {
-        emailInput.parentNode.lastElementChild.innerHTML = 'Email field cannot be blank';
-    } else {
-        emailInput.parentNode.lastElementChild.innerHTML = 'Email address must be formatted correctly';
-    }
-}
 
 
 

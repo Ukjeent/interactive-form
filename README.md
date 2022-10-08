@@ -15,7 +15,7 @@ Validation
 
 
 Conditional error message
-    The error message for the email field is conditional and changes depending on the user's input.
+    The error message for the email and name fields is conditional and changes depending on the user's input.
 
 Credit Card test numbers 
     American Express: 378282246310005
