@@ -11,7 +11,6 @@ Validation
         Activities - Atleast one activity has to be selected.
 
     The same validation is used when the user tries to submit the form. 
-    Obs! Selectfields is not being validated before submit.
 
 
 Conditional error message
